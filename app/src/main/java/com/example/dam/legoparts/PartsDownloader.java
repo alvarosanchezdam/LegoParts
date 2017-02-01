@@ -95,7 +95,7 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
     }
     @Override public void onPostExecute(String result) {
         if(result!=null){
-            //llistaPartsActivity.onCreate();
+            llistaPartsActivity.notifyDescarga(result);
         }
     }
 

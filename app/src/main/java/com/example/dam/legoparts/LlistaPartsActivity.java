@@ -28,59 +28,60 @@ import java.util.List;
 
 public class LlistaPartsActivity extends AppCompatActivity {
     public static String descarga;
-
+    private ListView llista;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_llista_parts);
-        ListView llista=(ListView) findViewById(R.id.llista_parts);
+        llista=(ListView) findViewById(R.id.llista_parts);
         Intent intent=this.getIntent();
-        if(descarga!=null){
-            String csvFile = descarga;
-            BufferedReader br = null;
-            String line = "";
-            String cvsSplitBy = ",";
-            List<Part> parts = new ArrayList<>();
-            try {
 
-                br = new BufferedReader(new StringReader(csvFile));
-                int count=0;
-                while ((line = br.readLine()) != null) {
-                    if(count>0) {
-                        String[] part = line.split(cvsSplitBy);
-
-                        Part p = new Part();
-                        p.setCantidad(Integer.parseInt(part[1]));
-                        p.setNombre(part[4]);
-                        if(part.length==12){
-                            p.setImgUrl(part[7]);
-                        }else {
-                            p.setImgUrl(part[6]);
-                        }
-                        parts.add(p);
-                    }else{
-                        count++;
-                    }
-                }
-
-                PartsAdapter adapter=new PartsAdapter(this, parts);
-                llista.setAdapter(adapter);
-
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else {
             String id = intent.getStringExtra("id");
             downloadLegoParts(id);
-            startActivity(intent);
+
+
+    }
+    public void notifyDescarga(String descarga){
+        String csvFile = descarga;
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        List<Part> parts = new ArrayList<>();
+        try {
+
+            br = new BufferedReader(new StringReader(csvFile));
+            int count=0;
+            while ((line = br.readLine()) != null) {
+                if(count>0) {
+                    String[] part = line.split(cvsSplitBy);
+
+                    Part p = new Part();
+                    p.setCantidad(Integer.parseInt(part[1]));
+                    p.setNombre(part[4]);
+                    if(part.length==12){
+                        p.setImgUrl(part[7]);
+                    }else {
+                        p.setImgUrl(part[6]);
+                    }
+                    parts.add(p);
+                }else{
+                    count++;
+                }
+            }
+
+            PartsAdapter adapter=new PartsAdapter(this, parts);
+            llista.setAdapter(adapter);
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     public void downloadLegoParts(String id) {
         PartsDownloader dd = new PartsDownloader(this, id);
-
+        dd.setLlistaPartsActivity(this);
                 dd.execute();
 
     }
