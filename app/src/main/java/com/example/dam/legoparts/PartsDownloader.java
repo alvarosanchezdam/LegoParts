@@ -96,8 +96,9 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
             output.flush();
             descarga=tsv;
             LlistaPartsActivity.descarga=tsv;
+            montarFile(descarga, id);
             return tsv;
-            //montarFile(descarga, id);
+
 
         } catch (MalformedURLException e) {
             System.out.println("Error 1");
@@ -130,6 +131,7 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
             e.printStackTrace();
         }
         //f.delete();
+
         PrintWriter wr = null;
         try {
             wr = new PrintWriter(f);

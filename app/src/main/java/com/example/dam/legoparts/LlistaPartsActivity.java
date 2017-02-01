@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -37,8 +39,35 @@ public class LlistaPartsActivity extends AppCompatActivity {
         Intent intent=this.getIntent();
 
             String id = intent.getStringExtra("id");
-            downloadLegoParts(id);
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/"+id+".txt");
+        if(dir.exists()){
+            String cadenaTotal="";
+            String cadena;
+            FileReader f = null;
+            try {
+                f = new FileReader(dir);
+                BufferedReader b = new BufferedReader(f);
+                int cont=0;
+                while((cadena = b.readLine())!=null) {
+                    if(cont==0){
+                        cadenaTotal+=cadena;
+                        cont++;
+                    }else {
+                        cadenaTotal += "\n" + cadena;
+                    }
+                }
+                b.close();
+                notifyDescarga(cadenaTotal);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+
+        }else {
+            downloadLegoParts(id);
+        }
 
     }
     public void notifyDescarga(String descarga){
