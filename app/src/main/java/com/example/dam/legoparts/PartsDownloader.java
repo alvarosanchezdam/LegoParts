@@ -56,7 +56,19 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
         this.listener = listener;
     }
     private ProgressDialog pDialog;
-
+    @Override protected void onPreExecute() {
+        pDialog = new ProgressDialog(context);
+        pDialog.setMessage("Downloading file. Please wait...");
+        pDialog.setIndeterminate(false);
+        pDialog.setMax(100);
+        pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pDialog.setCancelable(true);
+        pDialog.setTitle("Please wait...");
+        String msg = "Downloading...";
+        pDialog.setMessage(msg);
+        pDialog.setCancelable(true);
+        pDialog.show();
+    }
 
     @Override
     protected String doInBackground(Void... params) {
@@ -66,12 +78,16 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
             URL url = new URL("http://www.rebrickable.com/api/get_set_parts?key=ezTu0j5OCx&format=csv&set="+this.id);
             URLConnection connection = url.openConnection();
             connection.connect();
+            int lengthOfFile = connection.getContentLength();
+            pDialog.setMax(100);
             InputStream input = new BufferedInputStream(url.openStream(), 8192);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             byte data[] = new byte[1024];
             long total = 0;
             while ((count = input.read(data)) != -1) {
-                total += count;
+                total += 10;
+                publishProgress("" + (int) total);
+
                 output.write(data, 0, count);
             }
 
@@ -93,7 +109,11 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
 
 
     }
+    protected void onProgressUpdate(String... progress) {
+        pDialog.setProgress(Integer.parseInt(progress[0]));
+    }
     @Override public void onPostExecute(String result) {
+        pDialog.dismiss();
         if(result!=null){
             llistaPartsActivity.notifyDescarga(result);
         }
