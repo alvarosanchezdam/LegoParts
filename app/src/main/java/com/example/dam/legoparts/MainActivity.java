@@ -30,6 +30,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     Button boton;
+    Button boton2;
     EditText idText;
     Spinner spinner;
     File fParts;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         boton= (Button)findViewById(R.id.button);
+        boton2= (Button)findViewById(R.id.button_spinner);
         idText=(EditText) findViewById(R.id.idText);
         spinner= (Spinner) findViewById(R.id.spinner);
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
@@ -49,23 +51,24 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_WRITE_STORAGE);
             Log.d("prueba", "error no hay permiso");
         }
-        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String sDirectorio = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/";
-                File f = new File(sDirectorio);
-                f.mkdir();
-                File[] ficheros = f.listFiles();
-                fParts=ficheros[position];
-            }
-        });
+
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("flx", "MOVE en");
                 Intent intent = new Intent(MainActivity.this, LlistaPartsActivity.class);
-                intent.putExtra("id", idText.getText().toString());
+                intent.putExtra ("id", idText.getText().toString());
                 startActivity(intent);
+            }
+        });
+        boton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(fParts!=null){
+                    Intent intent = new Intent(MainActivity.this, LlistaPartsActivity.class);
+                    intent.putExtra ("id", fParts.getName().replace(".txt", ""));
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -100,9 +103,20 @@ public class MainActivity extends AppCompatActivity {
         String sDirectorio = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/";
         File f = new File(sDirectorio);
         f.mkdir();
-        File[] ficheros = f.listFiles();
+        final File[] ficheros = f.listFiles();
         SetAdapter adapter=new SetAdapter(this, ficheros);
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                fParts=ficheros[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
     public class SetAdapter extends BaseAdapter {
         private Context context;

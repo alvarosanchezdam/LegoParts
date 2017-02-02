@@ -56,7 +56,6 @@
             android:id="@+id/button_spinner"
             android:background="@android:color/holo_green_light"
             tools:padding="10dp"
-            android:textColor="?android:attr/detailsElementBackground"
-            android:fontFamily="serif" />
+            android:textColor="?android:attr/detailsElementBackground" />
     </LinearLayout>
 </RelativeLayout>
