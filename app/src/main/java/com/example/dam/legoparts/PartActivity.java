@@ -33,11 +33,13 @@ public class PartActivity extends AppCompatActivity {
         Intent intent= this.getIntent();
         String id=intent.getStringExtra("id");
         qtyInt= intent.getStringExtra("cantidad");
+        //Descarga de la pieza
         DescargaPart dp= new DescargaPart(this, id);
+        //Le cambio la activity para llamar despues al notify de esta descarga
         dp.setPartActivity(this);
         dp.execute();
     }
-
+    //Esta funcion recibe el objeto pieza para rellenar los datos de los view
     public void notifyPart(Pieza pieza) {
         name.setText(pieza.getName());
         qty.setText(qtyInt);
@@ -50,6 +52,7 @@ public class PartActivity extends AppCompatActivity {
             @Override
             public void onError() {}
         });
+        //La url es un boton que te enlaza con la pagina web donde se encuentra la pieza con todos sus detalles
         url.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

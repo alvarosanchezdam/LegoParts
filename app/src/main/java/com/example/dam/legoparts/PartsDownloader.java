@@ -28,6 +28,8 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
     private Context context;
     private String id;
     private String descarga;
+
+    //Creo un LListaPartsActivity para poder llamar al notify de esa clase
     private LlistaPartsActivity llistaPartsActivity;
 
     public LlistaPartsActivity getLlistaPartsActivity() {
@@ -55,6 +57,8 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
     public void setOnPartsLoadedListener(OnPartsLoadedListener listener) {
         this.listener = listener;
     }
+
+    // El progress dialog para la descarga
     private ProgressDialog pDialog;
     @Override protected void onPreExecute() {
         pDialog = new ProgressDialog(context);
@@ -75,6 +79,7 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
         int count;
 
         try {
+            //La url es de la API v2, formato csv y la añade la id de la caja
             URL url = new URL("http://www.rebrickable.com/api/get_set_parts?key=ezTu0j5OCx&format=csv&set="+this.id);
             URLConnection connection = url.openConnection();
             connection.connect();
@@ -96,7 +101,9 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
             output.flush();
             descarga=tsv;
             LlistaPartsActivity.descarga=tsv;
+            //Llamo a la funcion para crear el fichero con la descarga
             montarFile(descarga, id);
+            //Devuelvo un String con la descarga para en el onPostExecute llamar al notify
             return tsv;
 
 
@@ -116,15 +123,18 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
     @Override public void onPostExecute(String result) {
         pDialog.dismiss();
         if(result!=null){
+            //Llamo al notify para leer la descarga y rellenar la lista
             llistaPartsActivity.notifyDescarga(result);
         }
     }
 
     private void montarFile(String descarga, String id) {
+        //Me aseguro que la descarga no llega vacia, si es asi no la guardo en el fichero
         if (!descarga.equals("NOSET")) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Reabrickable");
             boolean result = dir.mkdir();
             if (dir == null) return;
+            //Le añado la extension txt
             File f = new File(dir, id + ".txt");
             try {
                 f.createNewFile();
@@ -135,6 +145,7 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
 
             PrintWriter wr = null;
             try {
+                //Escribo la descarga en el fichero creado
                 wr = new PrintWriter(f);
                 wr.println(descarga);
                 wr.close();

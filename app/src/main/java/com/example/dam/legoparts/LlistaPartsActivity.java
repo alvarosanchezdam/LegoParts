@@ -44,6 +44,7 @@ public class LlistaPartsActivity extends AppCompatActivity {
         tv.setText(" ");
         Intent intent=this.getIntent();
         String id = intent.getStringExtra("id");
+        //Busco el fichero con la id de la caja, si existe, no llamo a la descarga, leo las piezas de la caja directamente del fichero
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/"+id+".txt");
         if(dir.exists()){
             String cadenaTotal="";
@@ -71,10 +72,12 @@ public class LlistaPartsActivity extends AppCompatActivity {
 
 
         }else {
+            //El fichero no existe por lo que hago la descarga
             downloadLegoParts(id);
         }
 
     }
+    //Función para recibir la descarga, en este caso formato csv, lo leo con un BufferedReader
     public void notifyDescarga(String descarga){
         String csvFile = descarga;
         BufferedReader br = null;
@@ -86,6 +89,7 @@ public class LlistaPartsActivity extends AppCompatActivity {
             br = new BufferedReader(new StringReader(csvFile));
             int count=0;
             while ((line = br.readLine()) != null) {
+                //Este IF es para omitir la primera fila ya que son los titulos de las columnas
                 if(count>0) {
                     String[] part = line.split(cvsSplitBy);
 
@@ -103,12 +107,15 @@ public class LlistaPartsActivity extends AppCompatActivity {
                     count++;
                 }
             }
+            //Con este IF controlo si ha hecho la descarga, sino la hace no creo la lista. Hago un TextView para mostrarle el error.
             if(parts.size()==0){
                 tv.setText("No existe esta caja");
                 llista.setAlpha(0);
             } else {
+                // Creo el adapter de la lista
                 PartsAdapter adapter = new PartsAdapter(this, parts);
                 llista.setAdapter(adapter);
+                //Al hacer click en un item de la lista te lleva a otra avtivity con mas detalles de la pieza
                 llista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -168,6 +175,7 @@ public class LlistaPartsActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             View myView =convertView;
             if(myView ==null) {
+                //Inflo la lista con el layout que he creado (llista_item)
                 LayoutInflater inflater=(LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
                 myView = inflater.inflate(R.layout.llista_item, parent, false);
                 ViewHolder holder= new ViewHolder();
@@ -178,11 +186,13 @@ public class LlistaPartsActivity extends AppCompatActivity {
             }
             ViewHolder holder= (ViewHolder) myView.getTag();
 
+            //Voy asignando los datos
             Part part = parts.get(position);
             String image=part.getImgUrl();
             String urldisplay = image;
             Bitmap mIcon11 = null;
             try {
+                //Le cambio la imagen al ImageView por la url
                 Picasso.with(this.context).load(image).into(holder.ivImage, new Callback() {
                     @Override
                     public void onSuccess() {}

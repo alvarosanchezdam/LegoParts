@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         boton= (Button)findViewById(R.id.button);
-
         idText=(EditText) findViewById(R.id.idText);
         spinner= (ListView) findViewById(R.id.spinner);
+        //Para tratar con los ficheros de las descargas primero me aseguro que tiene el permiso de escribir y leer
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (!hasPermission) {
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("prueba", "error no hay permiso");
         }
 
+        //Envio la información del textfield al activity de la lista para descargar y mostrar
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        //Cada vez que vuelve al MainActivity se actualizara la lista de los ficheros.
+        // Esto lo uso para cuando vuelva a la Activity despues de haber hecho una busqueda
+        // se actualice y ya se pueda ver
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (hasPermission) {
@@ -74,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    //Pido el permiso en el caso que no lo tenga
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -91,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    //Actualizo la lista (antes era un spinner) donde están todos lo ficheros que se han creado
     public void updateSpinner(){
         String sDirectorio = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/";
         File f = new File(sDirectorio);
@@ -98,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         final File[] ficheros = f.listFiles();
         SetAdapter adapter=new SetAdapter(this, ficheros);
         spinner.setAdapter(adapter);
+
+        //Cuando haces click te abre la caja donde aparece la lista de todas las piezas
         spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -107,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //Si mantienes sobre un elemento de la lista de ficheros lo borra
         spinner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -116,11 +128,15 @@ public class MainActivity extends AppCompatActivity {
                 File f = new File(sDirectorio);
                 f.delete();
                 fParts=null;
+
+                //Lo actualizo para que se vea el cambio inmediatamente
                 updateSpinner();
                 return true;
             }
         });
     }
+
+    //Creo el adapter para llenar la lista
     public class SetAdapter extends BaseAdapter {
         private Context context;
         private File[] files;
@@ -148,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             public TextView tvNom;
         }
 
+        //Para inflar el adapter uso el layout propio creado (llista_item2)
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View myView =convertView;
@@ -161,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             ViewHolder holder= (ViewHolder) myView.getTag();
 
             File file = files[position];
+            // Reemplazo el .txt para quitar la extension
             final String nom=(String) file.getName().replace(".txt", "");
             holder.tvNom.setText(nom);
 

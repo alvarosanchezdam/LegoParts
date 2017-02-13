@@ -38,6 +38,7 @@ public class DescargaPart extends AsyncTask<Void, String, String> {
     public DescargaPart(Context context, String tema) {
         this.tema=tema;
         this.context = context;
+        //Creo el builder del gson para recibir el objeto de la descarga
         this.builder = new GsonBuilder();
         this.gson = builder.create();
     }
@@ -66,6 +67,7 @@ public class DescargaPart extends AsyncTask<Void, String, String> {
     @Override protected String doInBackground(Void... params) {
         int count;
         try {
+            //En este caso hago la descarda de la API v3 me devuelve un json
             URL url = new URL("http://rebrickable.com/api/v3/lego/parts/"+this.tema+"/?key=ezTu0j5OCx");
             URLConnection connection = url.openConnection();
             connection.connect();
@@ -91,8 +93,10 @@ public class DescargaPart extends AsyncTask<Void, String, String> {
         pDialog.setProgress(Integer.parseInt(progress[0]));
     }
     @Override public void onPostExecute(String json) {
+        //Hago el split del json al objeto pieza
         Pieza pieza = gson.fromJson(json,  Pieza.class);
         pDialog.dismiss();
+        //Llamo a la funcion para rellenar los datos con el objeto pieza
         partActivity.notifyPart(pieza);
     }
 
