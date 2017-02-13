@@ -121,27 +121,29 @@ public class PartsDownloader extends AsyncTask<Void, String, String> {
     }
 
     private void montarFile(String descarga, String id) {
-        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable");
-        boolean result =dir.mkdir();
-        if (dir == null) return;
-        File f = new File(dir, id+".txt");
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!descarga.equals("NOSET")) {
+            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Reabrickable");
+            boolean result = dir.mkdir();
+            if (dir == null) return;
+            File f = new File(dir, id + ".txt");
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //f.delete();
+
+            PrintWriter wr = null;
+            try {
+                wr = new PrintWriter(f);
+                wr.println(descarga);
+                wr.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
         }
-        //f.delete();
-
-        PrintWriter wr = null;
-        try {
-            wr = new PrintWriter(f);
-            wr.println(descarga);
-            wr.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
     }
     /*String str = "SomeMoreTextIsHere";
     File newTextFile = new File("C:/thetextfile.txt");

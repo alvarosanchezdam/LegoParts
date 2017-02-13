@@ -5,6 +5,7 @@ package com.example.dam.legoparts;
  */
 
 public class Part {
+    private String id;
     private int cantidad;
     private String nombre;
     private String imgUrl;
@@ -16,6 +17,14 @@ public class Part {
         this.cantidad = cantidad;
         this.nombre = nombre;
         this.imgUrl = imgUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public int getCantidad() {

@@ -12,11 +12,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,14 +34,16 @@ import java.util.List;
 public class LlistaPartsActivity extends AppCompatActivity {
     public static String descarga;
     private ListView llista;
+    private TextView tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_llista_parts);
         llista=(ListView) findViewById(R.id.llista_parts);
+        tv=(TextView) findViewById(R.id.tv);
+        tv.setText(" ");
         Intent intent=this.getIntent();
-
-            String id = intent.getStringExtra("id");
+        String id = intent.getStringExtra("id");
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/"+id+".txt");
         if(dir.exists()){
             String cadenaTotal="";
@@ -75,7 +80,7 @@ public class LlistaPartsActivity extends AppCompatActivity {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
-        List<Part> parts = new ArrayList<>();
+        final List<Part> parts = new ArrayList<>();
         try {
 
             br = new BufferedReader(new StringReader(csvFile));
@@ -85,6 +90,7 @@ public class LlistaPartsActivity extends AppCompatActivity {
                     String[] part = line.split(cvsSplitBy);
 
                     Part p = new Part();
+                    p.setId(part[0]);
                     p.setCantidad(Integer.parseInt(part[1]));
                     p.setNombre(part[4]);
                     if(part.length==12){
@@ -97,9 +103,24 @@ public class LlistaPartsActivity extends AppCompatActivity {
                     count++;
                 }
             }
-
-            PartsAdapter adapter=new PartsAdapter(this, parts);
-            llista.setAdapter(adapter);
+            if(parts.size()==0){
+                tv.setText("No existe esta caja");
+                llista.setAlpha(0);
+            } else {
+                PartsAdapter adapter = new PartsAdapter(this, parts);
+                llista.setAdapter(adapter);
+                llista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String idPart = parts.get(position).getId();
+                        Intent intent = new Intent(LlistaPartsActivity.this, PartActivity.class);
+                        intent.putExtra("id", idPart);
+                        String cantidad = String.valueOf(parts.get(position).getCantidad());
+                        intent.putExtra("cantidad", cantidad);
+                        startActivity(intent);
+                    }
+                });
+            }
 
 
         } catch (FileNotFoundException e) {
@@ -162,9 +183,12 @@ public class LlistaPartsActivity extends AppCompatActivity {
             String urldisplay = image;
             Bitmap mIcon11 = null;
             try {
-               /* InputStream in = new java.net.URL(image).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-                holder.ivImage.setImageBitmap(mIcon11);*/
+                Picasso.with(this.context).load(image).into(holder.ivImage, new Callback() {
+                    @Override
+                    public void onSuccess() {}
+                    @Override
+                    public void onError() {}
+                });
             }catch (Exception e) {
                 Log.e("Error", e.getMessage());
                 e.printStackTrace();

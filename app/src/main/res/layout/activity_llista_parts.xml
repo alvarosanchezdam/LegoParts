@@ -16,4 +16,13 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/llista_parts" />
+
+    <TextView
+        android:text="No existe esta caja"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textColor="@android:color/holo_red_dark" />
 </RelativeLayout>

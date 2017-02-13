@@ -19,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     Button boton;
     Button boton2;
     EditText idText;
-    Spinner spinner;
+    ListView spinner;
     File fParts;
     private static final int REQUEST_WRITE_STORAGE = 112;
     @Override
@@ -40,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         boton= (Button)findViewById(R.id.button);
-        boton2= (Button)findViewById(R.id.button_spinner);
+
         idText=(EditText) findViewById(R.id.idText);
-        spinner= (Spinner) findViewById(R.id.spinner);
+        spinner= (ListView) findViewById(R.id.spinner);
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (!hasPermission) {
@@ -61,16 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        boton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(fParts!=null){
-                    Intent intent = new Intent(MainActivity.this, LlistaPartsActivity.class);
-                    intent.putExtra ("id", fParts.getName().replace(".txt", ""));
-                    startActivity(intent);
-                }
-            }
-        });
+
     }
     @Override
     public void onResume() {
@@ -106,15 +98,26 @@ public class MainActivity extends AppCompatActivity {
         final File[] ficheros = f.listFiles();
         SetAdapter adapter=new SetAdapter(this, ficheros);
         spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fParts=ficheros[position];
+                Intent intent = new Intent(MainActivity.this, LlistaPartsActivity.class);
+                intent.putExtra ("id", fParts.getName().replace(".txt", ""));
+                startActivity(intent);
             }
-
+        });
+        spinner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                File file = ficheros[position];
+                final String nom=(String) file.getName();
+                String sDirectorio = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Reabrickable/"+nom;
+                File f = new File(sDirectorio);
+                f.delete();
+                fParts=null;
+                updateSpinner();
+                return true;
             }
         });
     }
@@ -150,16 +153,17 @@ public class MainActivity extends AppCompatActivity {
             View myView =convertView;
             if(myView ==null) {
                 LayoutInflater inflater=(LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-                myView = inflater.inflate(R.layout.spinner_item, parent, false);
+                myView = inflater.inflate(R.layout.llista_item2, parent, false);
                 ViewHolder holder= new ViewHolder();
-                holder.tvNom=(TextView) myView.findViewById(R.id.name);
+                holder.tvNom=(TextView) myView.findViewById(R.id.textView);
                 myView.setTag(holder);
             }
             ViewHolder holder= (ViewHolder) myView.getTag();
 
             File file = files[position];
-            String nom=(String) file.getName();
+            final String nom=(String) file.getName().replace(".txt", "");
             holder.tvNom.setText(nom);
+
             return myView;
         }
     }
